@@ -18,6 +18,14 @@
 <body>
     <h1>Hello world</h1>
     <ul class="users"></ul>
+    <form >
+        <label>
+            Color : <input type="color" class="color">
+        </label>
+        <label>
+            Stroke weight : <input type="range" min="1" max="50" value="4" class="weight">
+        </label>
+    </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -28,6 +36,9 @@
 
 
         const usersList = document.querySelector('.users');
+        const weightInput = document.querySelector('.weight');
+        const colorInput = document.querySelector('.color');
+        
         socket.on('users', (data) => {
             usersList.innerHTML = '';
             data.forEach((user) => {
@@ -50,17 +61,23 @@
 
         function mouseDragged() {
             if(!canDraw) return;
+            stroke(colorInput.value);
+            strokeWeight(weightInput.value);
             line(mouseX, mouseY, pmouseX, pmouseY);
 
             socket.emit('line', {
                 mouseX,
                 mouseY,
                 pmouseX,
-                pmouseY
+                pmouseY,
+                color: colorInput.value,
+                weight: weightInput.value
             });
         }
 
         socket.on('line', (data) => {
+            stroke(data.color);
+            strokeWeight(data.value);
             line(data.mouseX, data.mouseY, data.pmouseX, data.pmouseY);
         });
         socket.on('word', (nextWord)=> {
